@@ -257,7 +257,7 @@
         </div>
     </nav>
     <div class="container">
-        <form action="https://onexus-25.github.io/bistrot/dashboard" method="POST" class="contact-form" id="orderForm">
+        <form class="contact-form" id="orderForm">
             <section id="antipasti" class="menu-section">
                 <h2>Antipasti</h2>
                 <div class="menu-item" data-item-name="Bruschetta al Pomodoro Fresco" data-price="7.00">
@@ -496,16 +496,23 @@
 
             // Gestione dell'invio del form
             orderForm.addEventListener('submit', function(e) {
-                if (Object.keys(order).length === 0) {
-                    alert('Per favore, aggiungi almeno un piatto al tuo ordine.');
-                    e.preventDefault();
-                    return;
-                }
-                const orderDetails = Object.entries(order)
-                    .map(([name, details]) => `${name} (x${details.quantity})`)
-                    .join(', ');
-                hiddenOrderDetailInput.value = orderDetails;
-            });
+    // Impedisce l'invio standard del form.
+    e.preventDefault(); 
+    
+    if (Object.keys(order).length === 0) {
+        alert('Per favore, aggiungi almeno un piatto al tuo ordine.');
+        return;
+    }
+    
+    // Popola l'input nascosto con i dettagli dell'ordine
+    const orderDetails = Object.entries(order)
+        .map(([name, details]) => `${name} (x${details.quantity})`)
+        .join(', ');
+    hiddenOrderDetailInput.value = orderDetails;
+
+    // Esegue il reindirizzamento all'URL di GitHub Pages richiesto
+    window.location.href = 'https://onexus-25.github.io/bistrot/dashboard';
+});
 
             // Inizializza il costo al caricamento della pagina
             updateTotalCost();
