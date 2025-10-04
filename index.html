@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Server Bistrot - Menù & Ordini</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #0b0a0a;
+            --accent: #d4a574;
+            --accent-dark: #b8935f;
+            --bg-light: #fafaf8;
+            --bg-dark: #625030;
+            --text-light: #666;
+            --text-dark: #333;
+            --border: #e0e0e0;
+            --shadow: rgba(0, 0, 0, 0.08);
+            --shadow-hover: rgba(0, 0, 0, 0.15);
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            color: var(--text-dark);
+            background: linear-gradient(135deg, #fafaf8 0%, #f5f5f0 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Header Hero Section */
+        .hero-header {
+            background: linear-gradient(135deg, var(--bg-dark) 0%, #1a1a1a 100%);
+            color: white;
+            padding: 80px 20px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero-content { max-width: 800px; margin: 0 auto; }
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2.5rem, 6vw, 4rem);
+            font-weight: 900;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #fff, var(--accent));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .tagline {
+            font-size: 1.2rem;
+            color: var(--accent);
+            font-weight: 300;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        /* Navigation */
+        .menu-nav {
+            background: white;
+            box-shadow: 0 2px 20px var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            padding: 15px 0;
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.95);
+        }
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+        .menu-nav a {
+            text-decoration: none;
+            color: var(--text-dark);
+            font-weight: 500;
+            font-size: 0.95rem;
+            letter-spacing: 0.5px;
+            padding: 10px 20px;
+            border-radius: 30px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .menu-nav a:hover { color: var(--accent-dark); transform: translateY(-2px); }
+        .menu-nav a.active { color: var(--accent); font-weight: 700; }
+        .order-button-nav {
+            background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+            color: white !important;
+            font-weight: 600 !important;
+            box-shadow: 0 4px 15px rgba(212, 165, 116, 0.3);
+        }
+        .order-button-nav:hover { transform: translateY(-3px) !important; box-shadow: 0 6px 25px rgba(212, 165, 116, 0.4); }
+
+        /* Main Container */
+        .container { max-width: 1200px; margin: 0 auto; padding: 40px 20px; }
+
+        /* Menu Sections */
+        .menu-section {
+            margin-bottom: 60px;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeIn 0.8s ease-out forwards;
+        }
+        .menu-section:nth-child(1) { animation-delay: 0.1s; }
+        .menu-section:nth-child(2) { animation-delay: 0.2s; }
+        .menu-section:nth-child(3) { animation-delay: 0.3s; }
+        .menu-section:nth-child(4) { animation-delay: 0.4s; }
+        .menu-section:nth-child(5) { animation-delay: 0.5s; }
+        .menu-section:nth-child(6) { animation-delay: 0.6s; }
+        @keyframes fadeIn { to { opacity: 1; transform: translateY(0); } }
+        .menu-section h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 30px;
+            position: relative;
+            display: inline-block;
+            padding-bottom: 10px;
+        }
+        .menu-section h2::after {
+            content: ''; position: absolute; bottom: 0; left: 0; width: 60px; height: 3px;
+            background: linear-gradient(90deg, var(--accent), transparent); border-radius: 2px;
+        }
+        
+        /* Menu Items */
+        .menu-item {
+            background: white; border-radius: 16px; margin-bottom: 20px;
+            box-shadow: 0 2px 15px var(--shadow); transition: all 0.3s ease;
+            border: 2px solid transparent; padding: 25px;
+        }
+        .menu-item.selected { border-color: var(--accent); box-shadow: 0 8px 30px var(--shadow-hover); }
+        .menu-item:hover { transform: translateY(-5px); box-shadow: 0 8px 30px var(--shadow-hover); }
+
+        .menu-item-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 20px; }
+        .menu-item-info { flex: 1; }
+        .menu-item h3 {
+            font-family: 'Playfair Display', serif; font-size: 1.4rem; color: var(--primary); margin-bottom: 8px;
+            display: flex; justify-content: space-between; align-items: baseline;
+        }
+        /* NUOVO: Stile per il prezzo */
+        .item-price { font-family: 'Inter', sans-serif; font-size: 1.1rem; font-weight: 600; color: var(--accent-dark); }
+        .menu-item p { color: var(--text-light); font-size: 0.95rem; line-height: 1.6; }
+
+        /* Quantity Selector */
+        .quantity-selector { display: flex; align-items: center; gap: 12px; margin-top: 5px; }
+        .quantity-btn {
+            background-color: var(--accent); color: white; border: none; width: 32px; height: 32px;
+            border-radius: 50%; font-size: 1.4rem; font-weight: bold; cursor: pointer;
+            transition: all 0.2s; display: flex; align-items: center; justify-content: center; line-height: 1;
+        }
+        .quantity-btn:hover { background-color: var(--accent-dark); transform: scale(1.1); }
+        .quantity-btn.minus-btn { background-color: #f0f0f0; color: var(--text-dark); }
+        .quantity-btn.minus-btn:hover { background-color: #e0e0e0; }
+        .quantity-value { font-size: 1.2rem; font-weight: 600; color: var(--primary); min-width: 2ch; text-align: center; }
+        
+        /* Simple Menu Items */
+        .menu-item-simple {
+            background: white; border-radius: 12px; padding: 18px 25px; margin-bottom: 15px;
+            box-shadow: 0 2px 10px var(--shadow); transition: all 0.3s ease; display: flex;
+            justify-content: space-between; align-items: center; border: 2px solid transparent;
+        }
+        .menu-item-simple.selected { border-color: var(--accent); }
+        .menu-item-simple:hover { transform: translateX(10px); box-shadow: 0 4px 20px var(--shadow-hover); }
+        .menu-item-simple h3 {
+            font-size: 1.1rem; color: var(--text-dark); font-weight: 500; flex: 1;
+            display: flex; justify-content: space-between; align-items: baseline;
+        }
+
+        /* Order Form Section */
+        .order-form-section {
+            background: linear-gradient(135deg, white, #fdfdfb); border-radius: 24px; padding: 50px;
+            margin-top: 60px; box-shadow: 0 10px 40px var(--shadow);
+        }
+        .order-form-section h2 {
+            text-align: center; margin-bottom: 15px; background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .order-form-section > p { text-align: center; color: var(--text-light); margin-bottom: 40px; font-size: 1.05rem; }
+        /* NUOVO: Grid per i campi del form */
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .form-field-full { grid-column: 1 / -1; }
+        .contact-form div { margin-bottom: 25px; }
+        .contact-form label { display: block; margin-bottom: 8px; color: var(--text-dark); font-weight: 600; }
+        .contact-form input, .contact-form textarea {
+            width: 100%; padding: 15px; border: 2px solid var(--border); border-radius: 12px;
+            font-family: 'Inter', sans-serif; font-size: 1rem; transition: all 0.3s;
+        }
+        .contact-form input:focus, .contact-form textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 4px rgba(212, 165, 116, 0.1); }
+        .contact-form textarea { resize: vertical; min-height: 120px; }
+        
+        /* NUOVO: Stile per il totale */
+        .total-cost-container {
+            margin: 40px 0 30px 0; padding: 20px; border-radius: 16px;
+            background-color: #f7f7f5; border: 2px solid var(--border);
+            text-align: center;
+        }
+        .total-cost-container h3 {
+            font-family: 'Playfair Display', serif; font-size: 1.8rem;
+            color: var(--primary); margin-bottom: 10px;
+        }
+        #totalCostDisplay {
+            font-size: 2.5rem; font-weight: 700; color: var(--accent-dark);
+            transition: color 0.3s;
+        }
+
+        .contact-form button[type="submit"] {
+            display: block; width: 100%; padding: 18px 50px; background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+            color: white; border: none; border-radius: 50px; font-size: 1.1rem; font-weight: 600;
+            cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 20px rgba(212, 165, 116, 0.3);
+        }
+        .contact-form button[type="submit"]:hover { transform: translateY(-3px); box-shadow: 0 8px 30px rgba(212, 165, 116, 0.4); }
+
+        /* Footer */
+        footer {
+            background: linear-gradient(135deg, var(--bg-dark), #1a1a1a); color: white;
+            text-align: center; padding: 50px 20px; margin-top: 80px;
+        }
+        footer p { color: #aaa; margin-bottom: 10px; }
+        footer p:first-child { color: white; font-size: 1rem; margin-bottom: 15px; }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .menu-item-header { flex-direction: column; align-items: flex-start; }
+            .quantity-selector { margin-top: 15px; }
+            .form-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <header class="hero-header">
+        <div class="hero-content">
+            <h1>The Server Bistrot</h1>
+            <p class="tagline">Autentica cucina italiana, con amore</p>
+        </div>
+    </header>
+    <nav class="menu-nav">
+        <div class="nav-container">
+            <a href="#antipasti">Antipasti</a> <a href="#primi">Primi</a> <a href="#secondi">Secondi</a>
+            <a href="#pizze">Pizze</a> <a href="#dolci">Dolci</a> <a href="#bevande">Bevande</a>
+            <a href="#ordina" class="order-button-nav">Ordina Ora</a>
+        </div>
+    </nav>
+    <div class="container">
+        <form action="https://github.com/onexus-25/bistrot/dashboard.html" method="POST" class="contact-form" id="orderForm">
+            <section id="antipasti" class="menu-section">
+                <h2>Antipasti</h2>
+                <div class="menu-item" data-item-name="Bruschetta al Pomodoro Fresco" data-price="7.00">
+                    <div class="menu-item-header">
+                        <div class="menu-item-info">
+                            <h3>Bruschetta al Pomodoro Fresco <span class="item-price">€7.00</span></h3>
+                            <p>Pane casereccio tostato con pomodorini freschi, basilico, aglio e olio extravergine d'oliva.</p>
+                        </div>
+                        <div class="quantity-selector"><button type="button" class="quantity-btn minus-btn">-</button><span class="quantity-value">0</span><button type="button" class="quantity-btn plus-btn">+</button></div>
+                    </div>
+                </div>
+                <div class="menu-item" data-item-name="Carpaccio di Zucchine Marinate" data-price="9.00">
+                    <div class="menu-item-header">
+                        <div class="menu-item-info">
+                            <h3>Carpaccio di Zucchine Marinate <span class="item-price">€9.00</span></h3>
+                            <p>Sottili fette di zucchine fresche marinate con succo di limone, olio EVO e menta fresca.</p>
+                        </div>
+                        <div class="quantity-selector"><button type="button" class="quantity-btn minus-btn">-</button><span class="quantity-value">0</span><button type="button" class="quantity-btn plus-btn">+</button></div>
+                    </div>
+                </div>
+                <div class="menu-item" data-item-name="Tagliere di Salumi e Formaggi" data-price="15.00">
+                    <div class="menu-item-header">
+                        <div class="menu-item-info">
+                            <h3>Tagliere di Salumi e Formaggi <span class="item-price">€15.00</span></h3>
+                            <p>Selezione di salumi e formaggi accompagnati da miele e confetture.</p>
+                        </div>
+                        <div class="quantity-selector"><button type="button" class="quantity-btn minus-btn">-</button><span class="quantity-value">0</span><button type="button" class="quantity-btn plus-btn">+</button></div>
+                    </div>
+                </div>
+            </section>
+            <section id="primi" class="menu-section">
+                <h2>Primi Piatti</h2>
+                <div class="menu-item" data-item-name="Trofie Panna e Salmone" data-price="13.00">
+                    <div class="menu-item-header">
+                        <div class="menu-item-info"><h3>Trofie Panna e Salmone <span class="item-price">€13.00</span></h3><p>Delicate trofie artigianali avvolte in una leggera crema alla panna con salmone.</p></div>
+                        <div class="quantity-selector"><button type="button" class="quantity-btn minus-btn">-</button><span class="quantity-value">0</span><button type="button" class="quantity-btn plus-btn">+</button></div>
+                    </div>
+                </div>
+                <div class="menu-item" data-item-name="Lasagna alla Bolognese" data-price="12.00">
+                    <div class="menu-item-header">
+                        <div class="menu-item-info"><h3>Lasagna alla Bolognese <span class="item-price">€12.00</span></h3><p>Sfoglie di pasta fresca all'uovo, ragù tradizionale e besciamella cremosa.</p></div>
+                        <div class="quantity-selector"><button type="button" class="quantity-btn minus-btn">-</button><span class="quantity-value">0</span><button type="button" class="quantity-btn plus-btn">+</button></div>
+                    </div>
+                </div>
+                <div class="menu-item" data-item-name="Spaghetti alla Carbonara" data-price="12.00">
+                    <div class="menu-item-header">
+                        <div class="menu-item-info"><h3>Spaghetti alla Carbonara <span class="item-price">€12.00</span></h3><p>La vera ricetta romana con guanciale croccante, uova fresche e Pecorino Romano.</p></div>
+                        <div class="quantity-selector"><button type="button" class="quantity-btn minus-btn">-</button><span class="quantity-value">0</span><button type="button" class="quantity-btn plus-btn">+</button></div>
+                    </div>
+                </div>
+                <div class="menu-item" data-item-name="Spaghetti Cacio e Pepe" data-price="11.00">
+                    <div class="menu-item-header">
+                        <div class="menu-item-info"><h3>Spaghetti Cacio e Pepe <span class="item-price">€11.00</span></h3><p>Spaghetti mantecati con cremoso Pecorino Romano DOP e pepe nero macinato fresco.</p></div>
+                        <div class="quantity-selector"><button type="button" class="quantity-btn minus-btn">-</button><span class="quantity-value">0</span><button type="button" class="quantity-btn plus-btn">+</button></div>
+                    </div>
+                </div>
+            </section>
+            <section id="secondi" class="menu-section">
+                <h2>Secondi Piatti</h2>
+                <div class="menu-item" data-item-name="Petto di Pollo agli Agrumi" data-price="16.00">
+                    <div class="menu-item-header">
+                        <div class="menu-item-info"><h3>Petto di Pollo agli Agrumi <span class="item-price">€16.00</span></h3><p>Tenero petto di pollo marinato con succo d'arancia e limone, grigliato alla perfezione.</p></div>
+                        <div class="quantity-selector"><button type="button" class="quantity-btn minus-btn">-</button><span class="quantity-value">0</span><button type="button" class="quantity-btn plus-btn">+</button></div>
+                    </div>
+                </div>
+                <div class="menu-item" data-item-name="Insalatona con Tonno Fresco" data-price="15.00">
+                    <div class="menu-item-header">
+                        <div class="menu-item-info"><h3>Insalatona con Tonno Fresco <span class="item-price">€15.00</span></h3><p>Insalata mista, pomodorini, olive e teneri bocconcini di tonno fresco scottato.</p></div>
+                        <div class="quantity-selector"><button type="button" class="quantity-btn minus-btn">-</button><span class="quantity-value">0</span><button type="button" class="quantity-btn plus-btn">+</button></div>
+                    </div>
+                </div>
+            </section>
+            <section id="pizze" class="menu-section">
+                <h2>Le Nostre Pizze</h2>
+                <div class="menu-item" data-item-name="Pizza Margherita" data-price="8.00">
+                    <div class="menu-item-header">
+                        <div class="menu-item-info"><h3>Pizza Margherita <span class="item-price">€8.00</span></h3><p>Pomodoro San Marzano, mozzarella fior di latte, basilico fresco e olio extravergine.</p></div>
+                        <div class="quantity-selector"><button type="button" class="quantity-btn minus-btn">-</button><span class="quantity-value">0</span><button type="button" class="quantity-btn plus-btn">+</button></div>
+                    </div>
+                </div>
+                <div class="menu-item" data-item-name="Pizza Diavola" data-price="9.50">
+                    <div class="menu-item-header">
+                        <div class="menu-item-info"><h3>Pizza Diavola <span class="item-price">€9.50</span></h3><p>Pomodoro, mozzarella e salamino piccante.</p></div>
+                        <div class="quantity-selector"><button type="button" class="quantity-btn minus-btn">-</button><span class="quantity-value">0</span><button type="button" class="quantity-btn plus-btn">+</button></div>
+                    </div>
+                </div>
+                 <div class="menu-item" data-item-name="Pizza Quattro Stagioni" data-price="11.00">
+                    <div class="menu-item-header">
+                        <div class="menu-item-info"><h3>Pizza Quattro Stagioni <span class="item-price">€11.00</span></h3><p>Pomodoro, mozzarella, funghi, prosciutto cotto, carciofini e olive.</p></div>
+                        <div class="quantity-selector"><button type="button" class="quantity-btn minus-btn">-</button><span class="quantity-value">0</span><button type="button" class="quantity-btn plus-btn">+</button></div>
+                    </div>
+                </div>
+            </section>
+            <section id="dolci" class="menu-section">
+                <h2>Dolci</h2>
+                <div class="menu-item" data-item-name="Tiramisù della Casa" data-price="6.00">
+                    <div class="menu-item-header">
+                        <div class="menu-item-info"><h3>Tiramisù della Casa <span class="item-price">€6.00</span></h3><p>Il classico dolce al cucchiaio con savoiardi, caffè, mascarpone e cacao.</p></div>
+                        <div class="quantity-selector"><button type="button" class="quantity-btn minus-btn">-</button><span class="quantity-value">0</span><button type="button" class="quantity-btn plus-btn">+</button></div>
+                    </div>
+                </div>
+                <div class="menu-item" data-item-name="Sorbetto al Limone" data-price="5.00">
+                    <div class="menu-item-header">
+                        <div class="menu-item-info"><h3>Sorbetto al Limone <span class="item-price">€5.00</span></h3><p>Un rinfrescante sorbetto al limone di Sicilia.</p></div>
+                        <div class="quantity-selector"><button type="button" class="quantity-btn minus-btn">-</button><span class="quantity-value">0</span><button type="button" class="quantity-btn plus-btn">+</button></div>
+                    </div>
+                </div>
+            </section>
+            <section id="bevande" class="menu-section">
+                <h2>Bevande</h2>
+                <div class="menu-item-simple" data-item-name="Acqua Naturale/Frizzante" data-price="2.50">
+                    <h3>Acqua Naturale/Frizzante <span class="item-price">€2.50</span></h3>
+                    <div class="quantity-selector"><button type="button" class="quantity-btn minus-btn">-</button><span class="quantity-value">0</span><button type="button" class="quantity-btn plus-btn">+</button></div>
+                </div>
+                <div class="menu-item-simple" data-item-name="Bibita in Lattina" data-price="3.50">
+                    <h3>Bibita in Lattina (Cola/Aranciata) <span class="item-price">€3.50</span></h3>
+                    <div class="quantity-selector"><button type="button" class="quantity-btn minus-btn">-</button><span class="quantity-value">0</span><button type="button" class="quantity-btn plus-btn">+</button></div>
+                </div>
+                <div class="menu-item-simple" data-item-name="Vino della Casa (Calice)" data-price="5.00">
+                    <h3>Vino della Casa (Calice) <span class="item-price">€5.00</span></h3>
+                    <div class="quantity-selector"><button type="button" class="quantity-btn minus-btn">-</button><span class="quantity-value">0</span><button type="button" class="quantity-btn plus-btn">+</button></div>
+                </div>
+                 <div class="menu-item-simple" data-item-name="Birra alla spina" data-price="5.00">
+                    <h3>Birra alla spina <span class="item-price">€5.00</span></h3>
+                    <div class="quantity-selector"><button type="button" class="quantity-btn minus-btn">-</button><span class="quantity-value">0</span><button type="button" class="quantity-btn plus-btn">+</button></div>
+                </div>
+                <div class="menu-item-simple" data-item-name="Caffè Espresso" data-price="1.50">
+                    <h3>Caffè Espresso <span class="item-price">€1.50</span></h3>
+                    <div class="quantity-selector"><button type="button" class="quantity-btn minus-btn">-</button><span class="quantity-value">0</span><button type="button" class="quantity-btn plus-btn">+</button></div>
+                </div>
+            </section>
+
+            <section id="ordina" class="order-form-section">
+                <h2>Completa il tuo Ordine</h2>
+                <p>Aggiungi i piatti desiderati, specifica i dettagli e invia la tua comanda.</p>
+                
+                <div class="form-grid">
+                    <div>
+                        <label for="numeroPersone">Numero di Persone (Coperto: €2/cad)</label>
+                        <input type="number" id="numeroPersone" name="numero_persone" required min="1" value="1">
+                    </div>
+                    <div>
+                        <label for="numeroTavolo">Numero del Tavolo</label>
+                        <input type="number" id="numeroTavolo" name="numero_tavolo" required min="1">
+                    </div>
+                    <div class="form-field-full">
+                        <label for="nome">Il tuo Nome</label>
+                        <input type="text" id="nome" name="nome_cliente" required placeholder="Mario Rossi">
+                    </div>
+                    <div class="form-field-full">
+                        <label for="note">Note aggiuntive</label>
+                        <textarea id="note" name="note_cliente" rows="4" placeholder="Allergie, richieste particolari..."></textarea>
+                    </div>
+                </div>
+
+                <div class="total-cost-container">
+                    <h3>Stima Totale</h3>
+                    <p id="totalCostDisplay">€ 2.00</p>
+                </div>
+                
+                <input type="hidden" name="ordine_dettagliato" id="ordine_dettagliato">
+                <input type="hidden" name="costo_totale" id="costo_totale">
+                <input type="hidden" name="_subject" value="Nuovo Ordine da The Server Bistrot!">
+                <input type="text" name="_gotcha" style="display:none !important">
+
+                <button type="submit">Invia un Ordine di test e visualizza la dashboard</button>
+            </section>
+        </form>
+    </div>
+
+    <footer>
+        <p>© 2025 The Server Bistrot - Tutti i diritti riservati</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const COVER_CHARGE_PER_PERSON = 2.00;
+            const order = {}; 
+
+            // Elementi del DOM
+            const container = document.querySelector('.container');
+            const orderForm = document.getElementById('orderForm');
+            const hiddenOrderDetailInput = document.getElementById('ordine_dettagliato');
+            const hiddenTotalCostInput = document.getElementById('costo_totale');
+            const peopleInput = document.getElementById('numeroPersone');
+            const totalCostDisplay = document.getElementById('totalCostDisplay');
+
+            // Funzione per calcolare e aggiornare il costo totale
+            const updateTotalCost = () => {
+                let itemsTotal = 0;
+                for (const itemName in order) {
+                    const item = order[itemName];
+                    itemsTotal += item.price * item.quantity;
+                }
+
+                const numPeople = parseInt(peopleInput.value) || 0;
+                const coverChargeTotal = numPeople * COVER_CHARGE_PER_PERSON;
+
+                const finalTotal = itemsTotal + coverChargeTotal;
+                
+                totalCostDisplay.textContent = `€ ${finalTotal.toFixed(2)}`;
+                hiddenTotalCostInput.value = `€ ${finalTotal.toFixed(2)}`;
+            };
+            
+            // Event listener per i selettori di quantità
+            container.addEventListener('click', (e) => {
+                if (e.target.matches('.quantity-btn')) {
+                    const menuItemEl = e.target.closest('.menu-item, .menu-item-simple');
+                    const itemName = menuItemEl.dataset.itemName;
+                    const itemPrice = parseFloat(menuItemEl.dataset.price);
+                    const quantityValueEl = menuItemEl.querySelector('.quantity-value');
+                    
+                    let currentQuantity = parseInt(quantityValueEl.textContent);
+
+                    if (e.target.matches('.plus-btn')) {
+                        currentQuantity++;
+                    } else if (e.target.matches('.minus-btn') && currentQuantity > 0) {
+                        currentQuantity--;
+                    }
+                    
+                    quantityValueEl.textContent = currentQuantity;
+                    
+                    if (currentQuantity > 0) {
+                        order[itemName] = { quantity: currentQuantity, price: itemPrice };
+                        menuItemEl.classList.add('selected');
+                    } else {
+                        delete order[itemName];
+                        menuItemEl.classList.remove('selected');
+                    }
+                    updateTotalCost(); // Ricalcola il totale
+                }
+            });
+
+            // Event listener per il campo 'numero di persone'
+            peopleInput.addEventListener('input', updateTotalCost);
+
+            // Gestione dell'invio del form
+            orderForm.addEventListener('submit', function(e) {
+                if (Object.keys(order).length === 0) {
+                    alert('Per favore, aggiungi almeno un piatto al tuo ordine.');
+                    e.preventDefault();
+                    return;
+                }
+                const orderDetails = Object.entries(order)
+                    .map(([name, details]) => `${name} (x${details.quantity})`)
+                    .join(', ');
+                hiddenOrderDetailInput.value = orderDetails;
+            });
+
+            // Inizializza il costo al caricamento della pagina
+            updateTotalCost();
+
+            // --- Logica per lo scorrimento (invariata) ---
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const targetEl = document.querySelector(this.getAttribute('href'));
+                    if (targetEl) {
+                        const navHeight = document.querySelector('.menu-nav').offsetHeight;
+                        const pos = targetEl.getBoundingClientRect().top + window.pageYOffset - navHeight;
+                        window.scrollTo({ top: pos, behavior: 'smooth' });
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
